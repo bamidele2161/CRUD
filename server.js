@@ -5,7 +5,8 @@ const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const path = require("path"); //inbuilt in node application
 const connectDB = require("./server/database/connection");
-dotenv.config({ path: "config.env" });
+
+dotenv.config({ path: path.resolve(__dirname, "./.env") });
 const PORT = process.env.PORT || 8080;
 
 //log requests
@@ -24,7 +25,6 @@ app.set("view engine", "ejs"); //embedded javascript templating
 // app.set("views", path.resolve(__dirname, "views"))
 
 //load assets
-
 //css
 app.use("/css", express.static(path.resolve(__dirname, "assets/css")));
 //css/styles.css
