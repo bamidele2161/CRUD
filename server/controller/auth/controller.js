@@ -56,10 +56,9 @@ exports.find = (req, res) => {
   let id = req.params.id;
   if (id) {
     Userdb.findById(id)
+      .select("-password")
       .then((user) => {
-        res.send(
-          lodash.pick(user, ["_id", "name", "email", "gender", "status"])
-        );
+        res.send(user);
       })
       .catch((err) => {
         res
@@ -68,11 +67,9 @@ exports.find = (req, res) => {
       });
   } else {
     Userdb.find()
+      .select("-password")
       .then((user) => {
-        res.send(
-          user
-          // lodash.pick(user, ["_id", "name", "email", "gender", "status"])
-        );
+        res.send(user);
       })
       .catch((err) => {
         res
@@ -126,27 +123,29 @@ exports.delete = (req, res) => {
     });
 };
 
-// //login user
-// exports.login = (req, res) => {
-//   if (!req.body) {
-//     res.status(400).send({ message: "Content cannot be empty" });
-//     return;
-//   } else {
-//     if (req.body.email < 4) {
-//       res.status(400).send({ message: "minimum of 4 characters" });
-//     } else {
-//       Registerdb.findOne({ email: req.body.email })
-//         .then((data) => {
-//           if (!data) {
-//             res.status(400).send({ message: "User not found" });
-//           } else {
-//             // authentication
-//             res.send({ message: "Login successfully" });
-//           }
-//         })
-//         .catch((err) => {
-//           res.status(500).send({ message: err.message || "Error" });
-//         });
-//     }
-//   }
-// };
+//login user
+exports.login = async (req, res) => {
+  if (!req.body)
+    return res.status(400).send({ message: "Content cannot be empty" });
+
+  if (req.body.password < 4)
+    return res.status(400).send({ message: "minimum of 4 characters" });
+
+  let checkEmail = await Registerdb.findOne({ email: req.body.email });
+
+  if (!checkEmail)
+    return res.status(400).send({ message: "Invalid Emailsssss or Password" });
+
+  let checkPassword = await bcrypt.compare(
+    req.body.password,
+    checkEmail.password
+  );
+
+  if (!checkPassword)
+    return res
+      .status(400)
+      .send({ message: "Invalid Emailsssss or Passwordsss" });
+
+  const token = checkEmail.generateAuthToken();
+  res.send(token);
+};
