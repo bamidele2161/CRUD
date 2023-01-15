@@ -80,7 +80,7 @@ exports.find = (req, res) => {
 };
 
 //update a new identified user by user id
-exports.update = (req, res) => {
+exports.update = (req, res, next) => {
   if (!req.body) {
     res.status(404).send({ message: "Content cannot be empty" });
   }
@@ -131,10 +131,9 @@ exports.login = async (req, res) => {
   if (req.body.password < 4)
     return res.status(400).send({ message: "minimum of 4 characters" });
 
-  let checkEmail = await Registerdb.findOne({ email: req.body.email });
-
-  if (!checkEmail)
-    return res.status(400).send({ message: "Invalid Emailsssss or Password" });
+  let checkEmail = await Userdb.findOne({ email: req.body.email });
+  console.log(checkEmail);
+  if (!checkEmail) return res.status(400).send({ message: "Invalid Email" });
 
   let checkPassword = await bcrypt.compare(
     req.body.password,
@@ -147,5 +146,9 @@ exports.login = async (req, res) => {
       .send({ message: "Invalid Emailsssss or Passwordsss" });
 
   const token = checkEmail.generateAuthToken();
-  res.send(token);
+  res.status(200).send({
+    token: token,
+    data: lodash.pick(checkEmail, ["_id", "name", "email", "gender", "status"]),
+    message: "Login successfully",
+  });
 };
