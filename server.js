@@ -5,6 +5,7 @@ const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const path = require("path"); //inbuilt in node application
 const connectDB = require("./server/database/connection");
+const error = require("./server/middleware/error");
 
 dotenv.config({ path: path.resolve(__dirname, "./.env") });
 const PORT = process.env.PORT || 8080;
@@ -38,6 +39,7 @@ app.use("/js", express.static(path.resolve(__dirname, "assets/js")));
 //load routers
 app.use("/", require("./server/routes/router"));
 
+app.use(error);
 //app.use()
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost${PORT}`);

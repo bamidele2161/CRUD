@@ -12,7 +12,7 @@ function verifyToken(req, res, next) {
         .send({ auth: false, message: "Failed to authenticate token." });
     }
 
-    req.params.id = decoded.id;
+    req.user = decoded.id;
     next();
   });
 }

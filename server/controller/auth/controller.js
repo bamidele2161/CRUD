@@ -86,14 +86,17 @@ exports.update = (req, res, next) => {
   }
 
   const id = req.params.id;
-  Userdb.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
+  console.log("id", id);
+  Userdb.findByIdAndUpdate(id, req.body)
     .then((data) => {
       if (!data) {
         res.status(404).send({
           message: `Cannot update user with ${id}. Maybe user not found`,
         });
       } else {
-        res.send(data);
+        res
+          .status(200)
+          .send({ data: data, message: "User updated successfully" });
       }
     })
     .catch((err) => {
