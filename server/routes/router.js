@@ -11,10 +11,10 @@ route.get("/add-user", services.add_user);
 route.get("/update-user", services.update_user);
 
 //API
-route.post("/api/user", controller.create);
-route.get("/api/users", controller.find);
+route.post("/api/register", controller.register);
+route.get("/api/users", controller.getProfile);
 route.post("/api/login", controller.login);
-route.put("/api/user/:id", verifyToken, controller.update);
-route.delete("/api/user/:id", controller.delete);
+route.put("/api/user/:id", verifyToken, controller.updateUser);
+route.delete("/api/user/:id", verifyToken, controller.delete);
 
 module.exports = route;

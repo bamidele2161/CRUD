@@ -3,7 +3,7 @@ let lodash = require("lodash");
 let bcrypt = require("bcrypt");
 
 //create and save new user
-exports.create = async (req, res) => {
+exports.register = async (req, res) => {
   //validate request
   if (!req.body) {
     res.status(400).send({ message: "Content cannot be empty" });
@@ -12,11 +12,13 @@ exports.create = async (req, res) => {
 
   //new user
   const user = new Userdb({
-    name: req.body.name,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
     email: req.body.email,
     password: req.body.password,
+    phone: req.body.phone,
+    address: req.body.address,
     gender: req.body.gender,
-    status: req.body.status,
   });
 
   let saltRound = await bcrypt.genSalt(10);
@@ -34,7 +36,15 @@ exports.create = async (req, res) => {
             res
               .header("x-auth-token", token)
               .send(
-                lodash.pick(data, ["_id", "name", "email", "gender", "status"])
+                lodash.pick(data, [
+                  "_id",
+                  "firstName",
+                  "lastName",
+                  "email",
+                  "password",
+                  "address",
+                  "gender",
+                ])
               );
           })
           .catch((err) => {
@@ -52,7 +62,7 @@ exports.create = async (req, res) => {
 };
 
 //retrieve and return all users/retrive and return a single user
-exports.find = (req, res) => {
+exports.getProfile = (req, res) => {
   let id = req.params.id;
   if (id) {
     Userdb.findById(id)
@@ -80,7 +90,7 @@ exports.find = (req, res) => {
 };
 
 //update a new identified user by user id
-exports.update = (req, res, next) => {
+exports.updateUser = (req, res, next) => {
   if (!req.body) {
     res.status(404).send({ message: "Content cannot be empty" });
   }
@@ -94,9 +104,7 @@ exports.update = (req, res, next) => {
           message: `Cannot update user with ${id}. Maybe user not found`,
         });
       } else {
-        res
-          .status(200)
-          .send({ data: data, message: "User updated successfully" });
+        res.status(200).send({ message: "User updated successfully" });
       }
     })
     .catch((err) => {
@@ -144,9 +152,7 @@ exports.login = async (req, res) => {
   );
 
   if (!checkPassword)
-    return res
-      .status(400)
-      .send({ message: "Invalid Emailsssss or Passwordsss" });
+    return res.status(400).send({ message: "Invalid Email or Password" });
 
   const token = checkEmail.generateAuthToken();
   res.status(200).send({
